@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.16">
+	<Project ProjectGUID="{C0AB0957-1FEA-4E3E-81C5-CB1D1C8F7A22}" Target64Bit="true" ShowHideConfigurations="#x6">
+		<System>
+			<Settings MaxCpus="8" NonWinCpus="2">
+				<Cpu CpuId="6" BaseTime="2500"/>
+				<Cpu CpuId="7" BaseTime="2500"/>
+				<IoIdleTask CycleTime="2500" Affinity="#x00000040"/>
+			</Settings>
+			<Licenses>
+				<Target BkhfOrder="XPLNR Dongle" CustomOrder="BALA">
+					<TargetSelect TargetId="2">{66689887-CCBD-452C-AC9A-039D997C6E66}</TargetSelect>
+					<TargetSelect TargetId="2">{C362DA3A-1771-4019-9AF9-F39972E4A76D}</TargetSelect>
+					<TargetSelect TargetId="2">{520DE751-9DB6-47CB-8240-BD5C466E7E64}</TargetSelect>
+					<LicenseDevice DongleHardwareId="2" DongleDevice="#x03020005" DongleLevel="80" DongleSystemId="{6E9EA9C0-3017-DF7E-1F91-541D1566F9E0}" DongleSerialNumber="000bs99i" DongleCacheLicense="true"/>
+				</Target>
+			</Licenses>
+			<Tasks>
+				<Task Id="2" Priority="1" CycleTime="2500" AmsPort="350" Affinity="#x00000080" AdtTasks="true">
+					<Name>XPlanar Task_8</Name>
+				</Task>
+				<Task Id="3" Priority="2" Affinity="#x00000040" AdtTasks="true" JobTask="true">
+					<Name>Job Task</Name>
+					<ImageId>327</ImageId>
+				</Task>
+				<Task Id="4" Priority="3" CycleTime="2500" AmsPort="351" Affinity="#x00000040" AdtTasks="true">
+					<Name>MC-Task (MET)</Name>
+				</Task>
+				<Task Id="5" Priority="4" CycleTime="2500" AmsPort="352" Affinity="#x00000040" AdtTasks="true">
+					<Name>MC-Task (MPT)</Name>
+				</Task>
+				<Task Id="7" Priority="20" CycleTime="2500" AmsPort="353" AdtTasks="true">
+					<Name>PlcTask</Name>
+				</Task>
+			</Tasks>
+			<Modules>
+				<Module File="XPlanar.xti"/>
+			</Modules>
+		</System>
+		<Motion>
+			<MC File="XPlanar MC Project.xti"/>
+		</Motion>
+		<Plc>
+			<Project File="PLC_Proj.xti"/>
+		</Plc>
+		<Io>
+			<Device File="Device 1 (EtherCAT).xti" Id="1"/>
+			<Device File="Device 2 (USB).xti" Id="2"/>
+		</Io>
+	</Project>
+	<Mappings>
+		<MappingInfo Identifier="{00000000-2001-0850-0020-500830000403}" Id="#x02030030"/>
+		<MappingInfo Identifier="{02010020-0040-0201-6000-010110001105}" Id="#x02030010" Watchdog="04000000040000000400000004000000"/>
+		<MappingInfo Identifier="{02010020-0040-0201-7000-010120001105}" Id="#x02030020" Watchdog="04000000040000000400000004000000"/>
+		<MappingInfo Identifier="{02010040-2001-0850-1000-100500205008}" Id="#x02030040" Watchdog="04000000040000000400000004000000"/>
+		<MappingInfo Identifier="{02010040-2001-0850-1000-120500205008}" Id="#x02030050" Watchdog="04000000040000000400000004000000"/>
+		<MappingInfo Identifier="{02010040-2001-0850-2000-120500205008}" Id="#x02030060" Watchdog="04000000040000000400000004000000"/>
+		<MappingInfo Identifier="{02010040-2001-0850-3000-120500205008}" Id="#x02030070" Watchdog="04000000040000000400000004000000"/>
+		<MappingInfo Identifier="{02010040-2001-0850-4000-120500205008}" Id="#x02030080" Watchdog="04000000040000000400000004000000"/>
+	</Mappings>
+</TcSmProject>

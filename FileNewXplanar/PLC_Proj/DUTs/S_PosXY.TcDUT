@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="S_PosXY" Id="{368bd509-1be1-4c78-9720-8535110c0c1a}">
+    <Declaration><![CDATA[TYPE S_PosXY :
+STRUCT
+	X : LREAL;
+	Y : LREAL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

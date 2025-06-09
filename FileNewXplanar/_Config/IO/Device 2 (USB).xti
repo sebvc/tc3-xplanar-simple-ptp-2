@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.16" ClassName="CDevEthernetUsbDef" SubType="57">
+	<ImageDatas>
+		<ImageData Id="1000">424df60200000000000036000000280000000e00000010000000010018000000000000000000c30e0000c30e00000000000000000000ff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffffffff00ff000000000000000000000000000000000000000000000000000000000000000000000000ff00ff17ff000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ff000000ffffff000000ffffff000000ffffff000000000000000000ffffff171717ffffffffffff000000ffff000000ffffff000000ffffff000000ffffff000000ffffffffffffffffffeeeeee000000ffffff000000ffff000000ffffff000000000000ffffffffffff000000000000000000ffffffffffff101010ffffff000000ffff000000ffffff000000000000ffffffffffff000000ffffffffffffffffff000000ebebeb1e1e1e00000000ff000000ffffff000000ffffff000000ffffff000000000000000000ffffff000000ffffff000000000000ffff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ff303030000000000000000000000000000000000000000000000000000000000000000000000000303030ffffff00ffff00ff000000ffffffffffffffffffffffffffffffffffffffffffffffff000000ff00ffff00ffffffff00ffff00ff000000ffffffffffffffffffffffffffffffffffffffffffffffff000000ff00ffff00ffffffff00ffff00ff000000ffffffffffffffffffffffffffffffffffffffffffffffff000000ff00ffff00ffffffff00ffff00ff000000ffffffffffffffffffffffffffffffffffffffffffffffff000000ff00ffff00ffffffff00ffff00ff303030000000000000000000000000000000000000000000000000303030ff00ffff00ff00ff</ImageData>
+	</ImageDatas>
+	<Device Id="2" DevType="57" AmsPort="28674">
+		<Name>__FILENAME__</Name>
+		<Image Id="3" AddrType="1" ImageType="3">
+			<Name>Image</Name>
+		</Image>
+		<Box Id="5" BoxType="9900" AmsPort="28928">
+			<Name>Box 2 (C9900-L100 License-Key-USB-Stick)</Name>
+			<ImageId>1000</ImageId>
+			<Usb DipSwitch="2" DeviceHandle="\\?\usb#vid_0978&amp;pid_9900#5&amp;3908a26f&amp;0&amp;2#{38ab75a3-c17b-42d5-a56f-fcfa8acc2335}" VendorId="2" ProductCode="648809476" RevisionNo="1186060" nImageUpdateCycleTimeMs="50" nAmsPortEsbDevice="28162" Divider="199" AutoDivider="true">
+				<EtherCAT SlaveType="2" PdiType="#x0005" SyncUnitBits="false" MboxDataLinkLayer="true" StateMBoxPolling="true" CycleMBoxPollingTime="0" CoeType="35" FoeType="1" VendorId="#x00000002" ProductCode="#x26ac0c04" RevisionNo="#x0012190c" InfoDataState="false" TimeoutMailbox2="3000" CheckRevisionNoType="3" PortPhys="3">
+					<SyncMan>001000012600010001000000300000010001001026010000</SyncMan>
+					<SyncMan>001100012200010002000000300000010001001122010000</SyncMan>
+					<Fmmu>00000000000000000d0800010100000003000000000000000000000000000000</Fmmu>
+					<MBoxUserCmdData>004003000a00000000000000030010000000000000000000000000000000000020f3100502000000000000</MBoxUserCmdData>
+					<CoeProfile ProfileNo="43914121" DisplayName="Licensing"/>
+				</EtherCAT>
+			</Usb>
+		</Box>
+		<Usb VirtualDeviceName="true"/>
+	</Device>
+</TcSmItem>

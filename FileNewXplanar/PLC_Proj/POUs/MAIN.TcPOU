@@ -1,0 +1,428 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="MAIN" Id="{edfbc376-5cd9-4d69-b54b-d2222680b058}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR CONSTANT
+	MOVER_COUNT : UINT := XPlanarApplication.SystemParameters.MOVER_COUNT;
+	TRACK_COUNT : UINT := XPlanarApplication.SystemParameters.TRACK_COUNT;
+END_VAR
+VAR
+	LicUsbState AT %I* : UINT;
+	XPlanarTable : FB_Component_XPlanar;
+	aMovers : ARRAY[1..MOVER_COUNT] OF FB_XPlanarMover;
+	aTracks : ARRAY[1..TRACK_COUNT] OF FB_XPlanarTrackSegment;
+	
+	i: UINT;
+	
+	EnableMovers : BOOL;
+	DisableMovers : BOOL;
+	MoveCmd1 : BOOL;
+	MoveCmd2 : BOOL;
+	SquareCmd : BOOL;
+	RotateCmd : BOOL;
+
+	
+	CmdResult :  ARRAY[1..MOVER_COUNT] OF I_PlanarTaskResult;
+	
+	all_done: BOOL;
+	all_done_count : UINT;
+	ActionType : UINT; 
+	NumAngle: LREAL := 0;
+	NumTurns: DINT := 1;
+	bInitMain: BOOL := TRUE;
+	
+	//------------------------------------------
+
+	
+	//positions
+	aPos	: ARRAY [0..30] OF FB_Position;
+	
+
+	//Values used during init steps
+	Velocity			: LREAL := 1_000;
+	Acceleration		: LREAL := 6_000;
+	Deceleration		: LREAL := 6_000;
+	Jerk				: LREAL := 50_000;
+
+	
+	//StateMachine
+	XPlanarState		: INT;
+	ErrorOccuredInState	: INT;
+	
+	
+	InitTimer: TON;
+
+	bUpdatePositions: BOOL := TRUE;
+	bUpdateConstraints: BOOL := TRUE;
+	
+	//Move Sequence
+	MovePosOrder : ARRAY[1..MOVER_COUNT] OF ARRAY[1..50] OF INT := 	// second index value (length of second array)should be greater than or equal to Max_Move_Step_count
+			//	x		1-loop	|	back&forth		 |	2-loop	  | 2- small 8/infinity 		     | both tiles spin
+			[[	  1,  3, 21, 19,  1,  3, 21,  3, 21,  3, 21, 19,  1,  9,  7,  3,  1,  9,  7,  3,  1,  5], 
+			[	 21, 19,  1,  3, 21, 19,  1, 19,  1, 19,  1,  3, 21, 13, 15, 19, 21, 13, 15, 19, 21, 17]];
+	isActionStation: ARRAY[1..MOVER_COUNT] OF ARRAY[1..50] OF INT := 
+			[[	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1], 
+			[	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0]];
+	Max_Move_Step_count : INT := 22; // MovePosOrder[i][Max_Move_Step_count] should be a valid move to loop back to MovePosOrder[i][1] 
+	i_MPO_step : INT := 1;
+	ManualOveride: BOOL := FALSE;
+	bUpcomingAction: BOOL := FALSE;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// set the interfaces for the background functions **this must be done first!**
+(* // DONE IN FB_INIT
+	IF bInitMain THEN
+		FOR i := 1 TO MOVER_COUNT DO
+			ip.Movers[i] := aMovers[i];
+		END_FOR
+		FOR i := 1 TO TRACK_COUNT DO
+			ip.Tracks[i] := aTracks[i];
+		END_FOR
+		binitMain := FALSE;
+	END_IF
+*)
+
+//keep the XPlanar system up to date
+XPlanarTable.CyclicLogic();
+
+
+IF bUpdatePositions THEN
+	bUpdatePositions:= FALSE;
+	MAIN.UpdatePositions();
+END_IF
+
+IF bUpdateConstraints THEN // Update Mover Dynamics
+	bUpdateConstraints:=FALSE;
+	MAIN.UpdateConstraints();
+END_IF
+
+// ----------------------------------------------------------------- 
+// ------------------------- Control Logic ------------------------- 
+// ----------------------------------------------------------------- 
+
+IF ManualOveride THEN
+		
+	IF EnableMovers  THEN EnableMovers  := NOT(aMovers[1].Enable().Done  AND aMovers[2].Enable().Done ); END_IF
+	IF DisableMovers THEN DisableMovers := NOT(aMovers[1].Disable().Done AND aMovers[2].Disable().Done); END_IF
+	
+	IF MoveCmd1 THEN IF aMovers[1].MoveCommand.FreeMove(120,120).Done THEN MoveCmd1 := FALSE; END_IF END_IF
+	IF MoveCmd2 THEN IF aMovers[2].MoveCommand.FreeMove(120,360).Done THEN MoveCmd2 := FALSE; END_IF END_IF
+	
+	IF SquareCmd THEN
+		all_done_count:=0;
+		FOR i := 1 TO MOVER_COUNT DO
+			all_done_count := all_done_count + BOOL_TO_UINT(aMovers[i].MoveCommand.SquareUp().Done);
+				END_FOR
+		IF all_done_count = MOVER_COUNT THEN
+			SquareCmd := FALSE;
+		END_IF
+	END_IF
+	IF RotateCmd THEN
+		all_done_count:=0;
+		FOR i := 1 TO MOVER_COUNT DO
+			all_done_count := all_done_count + BOOL_TO_UINT(aMovers[i].MoveCommand.Rotate(NumAngle,NumTurns).Done);
+		END_FOR
+		IF all_done_count = MOVER_COUNT THEN
+			RotateCmd := FALSE;
+		END_IF
+	END_IF
+
+	
+	
+	// ----------------------------------------------------------------- 
+	(*
+	All sample code provided by Beckhoff Automation LLC are for illustrative purposes only and are provided “as is” and without any warranties, express or implied. 
+	Actual implementations in applications will vary significantly. 
+	Beckhoff Automation LLC shall have no liability for, and does not waive any rights in relation to, any code samples that it provides or the use of such code samples for any purpose.
+	*)
+
+
+ELSE
+	InitTimer(IN:= TRUE, PT:= T#3S, Q=> , ET=> );
+	CASE XPlanarState OF // not manual overide bool
+		0: //just start after Timer on Init
+			IF InitTimer.Q THEN
+				XPlanarState := 10;
+				InitTimer(in:=FALSE);
+			END_IF
+		1: // start after disable
+			IF EnableMovers THEN
+				XPlanarState := 10;// enable state
+			END_IF
+			
+		-10: // Disable Mover
+			all_done:=TRUE;
+			FOR i:=1 TO MOVER_COUNT DO
+				IF NOT aMovers[i].Disable().Done THEN
+					all_done := FALSE;
+				END_IF
+				IF aMovers[i].Disable().Error THEN
+					ErrorOccuredInState := XPlanarState;
+					XPlanarState := 999;
+				END_IF
+			END_FOR
+			IF all_done THEN
+				XPlanarState := 1;
+			END_IF
+		10: //Enable Movers
+			all_done:=TRUE;
+			FOR i:=1 TO MOVER_COUNT DO
+				IF NOT aMovers[i].Enable().Done THEN
+					all_done := FALSE;
+				END_IF
+				IF aMovers[i].Enable().Error THEN
+					ErrorOccuredInState := XPlanarState;
+					XPlanarState := 999;
+				END_IF
+			END_FOR
+			IF all_done THEN
+				XPlanarState := 11;
+			END_IF
+		11: // Square Up movers
+			all_done_count:=0;
+			FOR i := 1 TO MOVER_COUNT DO
+				all_done_count := all_done_count + BOOL_TO_UINT(aMovers[i].MoveCommand.SquareUp().Done);
+					END_FOR
+			IF all_done_count = MOVER_COUNT THEN
+				XPlanarState := 200;
+			END_IF
+		
+		20: //Wait for mover enable or arrive at desired position
+			all_done:=TRUE;
+			FOR i:=1 TO MOVER_COUNT DO
+				IF NOT CmdResult[i].Done THEN
+					all_done:=FALSE;
+				END_IF
+				IF CmdResult[i].Error THEN 
+					ErrorOccuredInState := XPlanarState;
+					XPlanarState := 999;
+				END_IF
+			END_FOR
+			IF all_done THEN
+				IF bUpcomingAction THEN
+					XPlanarState := 30;
+					bUpcomingAction:=FALSE;
+				ELSE 
+					i_MPO_step := i_MPO_step + 1;// increment itterator
+						IF i_MPO_step > Max_Move_Step_count THEN // roll over step = number of steps desired in move list (MovePosOrder[i])
+							i_MPO_step := 1;
+						END_IF
+					XPlanarState := 200; // back to next move
+				END_IF
+			END_IF
+		30: //Do action at position (e.g. wait, spin, float, complete externalsetpoint)
+			//DO!!!!!
+			FOR i := 1 TO MOVER_COUNT DO
+				CASE isActionStation[i][i_MPO_step] OF
+					0: //Do nothing
+					-10..-1,1..10: // Turn N times (Spin MOD(0) + N-number of turns)
+						cmdResult[i] := aMovers[i].MoveCommand.Rotate(0, isActionStation[i][i_MPO_step]); 
+					11: // Spin a Var amount
+						cmdResult[i] := aMovers[i].MoveCommand.Rotate(NumAngle, NumTurns); 
+					12: // Square Up
+						cmdResult[i] := aMovers[i].MoveCommand.SquareUp();
+					13: // vertical Move
+						cmdResult[i] := aMovers[i].MoveCommand.VerticalMove(5); //mm i think
+					14: // vertical Move to 0
+						cmdResult[i] := aMovers[i].MoveCommand.VerticalMove(0); //mm i think
+					20..30:
+						cmdResult[i] := aMovers[i].MoveCommand.FreeMove(
+										XPosition:=aMOvers[i].ActualPosition.x + 10,
+										YPosition:=aMOvers[i].ActualPosition.y + 10);					
+					ELSE
+						//Do nothing
+				END_CASE
+		
+				//cmdResult[i] := aMovers[i].MoveCommand.FreeMove(); // M[i].doThing() 
+			END_FOR
+				XPlanarState := 20;
+
+			
+		200://Move movers to the next place in MovePosOrder[i] Array
+			//MOVE!!!!!
+			bUpcomingAction := FALSE;
+			FOR i := 1 TO MOVER_COUNT DO				
+				// This aPos[#] is a position index, but taken out of an array that serves as a logical position order loop
+				cmdResult[i] := aMovers[i].MoveCommand.FreeMove(aPos[MovePosOrder[i][i_MPO_step]].X, 
+																aPos[MovePosOrder[i][i_MPO_step]].Y); // M[i]
+ 				IF isActionStation[i][i_MPO_step] <> 0 THEN
+					bUpcomingAction := TRUE;
+				END_IF
+			END_FOR
+			XPlanarState := 20;
+			// if doing action at next spot, (e.g. need to be at a rotate spot to spin) don't iterate Step
+			// if not doing action at next spot/spinning next/spinning done:
+
+		
+	(*	
+	50://Wait for Run Circles
+		Ready:= TRUE;
+		IF RunCircles THEN
+			Mover.StartExternalSetpointGeneration(0, 0);
+			XPlanarState:= 60;
+		END_IF
+		
+		60: //Run Circles
+		PositionVector.x := 240+rCos;
+		PositionVector.y := 240+rSin;
+		
+		VelocityVector.x		:= -Radius * rOmega * SIN(DEG_TO_RAD(rDeg));
+		VelocityVector.y		:= -Radius * rOmega * COS(DEG_TO_RAD(rDeg));
+		
+		AccelerationVector.x	:= -Radius * (rOmega * rOmega) * COS(DEG_TO_RAD(rDeg));
+		AccelerationVector.y	:= -Radius * (rOmega * rOmega) * SIN(DEG_TO_RAD(rDeg));
+		
+		Mover.SetExternalSetpoint(PositionVector, VelocityVector, AccelerationVector);
+		
+	*)
+		999://Wait Here for troubleshooting in case of error
+		900://Recovery state
+			//disable
+			//figure out which mover is closer to origin/y=0 line/bottom of tiles
+			//enable
+			//send closer one down, farther one up, maybe one axis (xy) at a time
+			//then to positions 3 and 19 opposite corners ( different starting sequence steps)
+			// start Move sequence (MovePosOrder) from first sequence step(index 1)(in this case M1->1 & M2_>21
+	
+	END_CASE
+END_IF
+]]></ST>
+    </Implementation>
+    <Method Name="FB_init" Id="{c9a65361-55a5-4e9a-8a2a-46c857466d83}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+    bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+    bInCopyCode  : BOOL; // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[FOR i := 1 TO XPlanarApplication.SystemParameters.MOVER_COUNT DO
+	ip.Movers[i] := aMovers[i];
+END_FOR
+FOR i := 1 TO XPlanarApplication.SystemParameters.TRACK_COUNT DO
+	ip.Tracks[i] := aTracks[i];
+END_FOR
+
+bUpdatePositions := TRUE;
+bUpdateConstraints := TRUE;
+
+
+FB_init := true; //Done]]></ST>
+      </Implementation>
+    </Method>
+    <Action Name="UpdateConstraints" Id="{0dbed265-08e6-4fb2-b03b-d23eb0731465}">
+      <Implementation>
+        <ST><![CDATA[//IF bUpdateConstraints THEN // Update Mover Dynamics
+//	bUpdateConstraints:=FALSE;
+//Velocity, Acceleration, Deceleration, Jerk, Rotation
+FOR i := 1 TO MOVER_COUNT DO
+	aMovers[i].Dynamics.Movement.Velocity:=Velocity;
+	aMovers[i].Dynamics.Movement.Accel:=Acceleration;
+	aMovers[i].Dynamics.Movement.Decel:=Deceleration;
+	aMovers[i].Dynamics.Movement.Jerk:=Jerk;
+	
+	aMovers[i].Dynamics.Rotation.Velocity:=Velocity;
+	aMovers[i].Dynamics.Rotation.Accel:=Acceleration;
+	aMovers[i].Dynamics.Rotation.Decel:=Deceleration;
+	aMovers[i].Dynamics.Rotation.Jerk:=Jerk;
+END_FOR
+MAIN.FB_init(TRUE,TRUE);
+//END_IF]]></ST>
+      </Implementation>
+    </Action>
+    <Action Name="UpdatePositions" Id="{84adb86d-be4b-49c8-9857-838be366c2d3}">
+      <Implementation>
+        <ST><![CDATA[//IF bUpdatePositions THEN
+//	bUpdatePositions:= FALSE;
+//Setup inputs
+aPos[0].SetXY(60,60);
+(*
+	aPos[1].SetXY(180,60);
+	aPos[2].SetXY(180,420);
+	aPos[3].SetXY(60,420);
+	aPos[4].SetXY(120,240);//center
+	aPos[5].SetXY(120,240,720);//center
+*)
+
+aPos[1].SetXY( 60,  60);
+aPos[2].SetXY(120,  60);
+aPos[3].SetXY(180,  60);
+					  
+aPos[4].SetXY( 60, 120);
+aPos[5].SetXY(120, 120);
+aPos[6].SetXY(180, 120);
+					  
+aPos[7].SetXY( 60, 180);
+aPos[8].SetXY(120, 180);
+aPos[9].SetXY(180, 180);
+
+aPos[10].SetXY( 60, 240);
+aPos[11].SetXY(120, 240);
+aPos[12].SetXY(180, 240);
+					   
+aPos[13].SetXY( 60, 300);
+aPos[14].SetXY(120, 300);
+aPos[15].SetXY(180, 300);
+
+aPos[16].SetXY( 60, 360);
+aPos[17].SetXY(120, 360);
+aPos[18].SetXY(180, 360);
+					   
+aPos[19].SetXY( 60, 420);
+aPos[20].SetXY(120, 420);
+aPos[21].SetXY(180, 420);
+(*
+
+	current Default program sequence in MAIN.MovePosOrder
+			//	x		1-loop	|	back&forth		 |	2-loop	  | 2- small 8/infinity 		     | both tiles spin
+			[[	  1,  3, 21, 19,  1,  3, 21,  3, 21,  3, 21, 19,  1,  9,  7,  3,  1,  9,  7,  3,  1,  5 ], 
+			[	  21, 19,  1,  3, 21, 19,  1, 19,  1, 19,  1,  3, 21, 13, 15, 19, 21, 13, 15, 19, 21, 17]];
+			=4 ==> Max_Move_Step_count := 22
+
+	(*simple square move example	
+		Desired motion1	1->3->21->19 ==> MovePosOrder[1][Max_Move_Step_count]
+		Desired motion2	21->19->1->3 ==> MovePosOrder[2][Max_Move_Step_count]
+									=4 ==> Max_Move_Step_count := 4
+	*)
+
+	2-Tile layout of (x,y) positions				
+
+(0,480)							(240,480)
+	  _____________	  _____________	
+	|				|				|             
+	|				|				|         
+	|		19		20		21		|         
+	|				|				|         
+	|				|				|         
+	| ----- 16 ----	17 ---- 18 ----	|         
+	|				|				|           
+	|				|				|           
+	|		13		14		15		|          
+	|				|				| 
+	|				|				|         
+	| ===== 10 ==== 11 ==== 12 ====	|
+	|				|				|             
+	|				|				|         
+	|		7		8		9		|          
+	|				|				|           
+	|				|				|           
+	| ----- 4 -----	5 ----- 6 -----	|
+	|				|				|           
+	|				|				|           
+	|		0,1		2		3		|          
+	|				|				|         
+	| 				| 				|
+	  ¯¯¯¯¯¯¯¯¯¯¯¯¯   ¯¯¯¯¯¯¯¯¯¯¯¯¯
+(0,0)							(240,0)
+
+*)
+
+//Position.SetXY((240+rCos), (240+rSin), 2);
+
+//END_IF
+]]></ST>
+      </Implementation>
+    </Action>
+  </POU>
+</TcPlcObject>
