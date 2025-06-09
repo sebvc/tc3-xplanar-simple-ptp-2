@@ -407,3 +407,7 @@ MigrationBackup/
 .ionide/
 
 # End of https://www.toptal.com/developers/gitignore/api/twincat3,vs
+
+# License
+*.tclrs
+*.tclrq
