@@ -411,3 +411,6 @@ MigrationBackup/
 # License
 *.tclrs
 *.tclrq
+# TwinCAT HMI, filter downloaded JSON schema files
+json-schema.org
+
