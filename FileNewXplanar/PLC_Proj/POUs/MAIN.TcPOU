@@ -7,15 +7,19 @@ VAR CONSTANT
 	TRACK_COUNT : UINT := XPlanarApplication.SystemParameters.TRACK_COUNT;
 END_VAR
 VAR
-	LicUsbState AT %I* : UINT;
+	LicUsbState AT %I* : UINT; // license dongle state
 	XPlanarTable : FB_Component_XPlanar;
 	aMovers : ARRAY[1..MOVER_COUNT] OF FB_XPlanarMover;
 	aTracks : ARRAY[1..TRACK_COUNT] OF FB_XPlanarTrackSegment;
-	
+	//mover index itterator
 	i: UINT;
 	
-	EnableMovers : BOOL;
-	DisableMovers : BOOL;
+	EnableMovers : BOOL;	// Enable All Movers
+	DisableMovers : BOOL;   // Disable All Movers
+	EnableMoverN : BOOL; 	// Enable a single Mover in aMovers[1..N]
+	DisableMoverN : BOOL;	// Disable a single Mover in aMovers[1..N]
+	MoverN: UINT := 1;  	// for selecting a single Mover in aMovers[1..N]
+
 	MoveCmd1 : BOOL;
 	MoveCmd2 : BOOL;
 	SquareCmd : BOOL;
@@ -33,40 +37,45 @@ VAR
 	
 	//------------------------------------------
 
-	
-	//positions
-	aPos	: ARRAY [0..30] OF FB_Position;
-	
-
 	//Values used during init steps
-	Velocity			: LREAL := 1_000;
-	Acceleration		: LREAL := 6_000;
-	Deceleration		: LREAL := 6_000;
-	Jerk				: LREAL := 50_000;
+	//positions
+		aPos	: ARRAY [0..30] OF FB_Position;	
+	// Updates Cyclically Until turned off
+		bUpdatePositions: BOOL := TRUE;
+		bUpdateConstraints: BOOL := TRUE;
+	//Movement Dynamics
+		Velocity_m			: LREAL := 1_000;
+		Acceleration_m		: LREAL := 6_000;
+		Deceleration_m		: LREAL := 6_000;
+		Jerk_m				: LREAL := 50_000;
+	//Rotation Dynamics
+		Velocity_r			: LREAL := 1_000;
+		Acceleration_r		: LREAL := 6_000;
+		Deceleration_r		: LREAL := 6_000;
+		Jerk_r				: LREAL := 50_000;
 
 	
 	//StateMachine
 	XPlanarState		: INT;
 	ErrorOccuredInState	: INT;
 	
-	
+	//Delay Start Auto Run
 	InitTimer: TON;
+	tDelayAutoStart: TIME := T#5S;
 
-	bUpdatePositions: BOOL := TRUE;
-	bUpdateConstraints: BOOL := TRUE;
-	
 	//Move Sequence
 	MovePosOrder : ARRAY[1..MOVER_COUNT] OF ARRAY[1..50] OF INT := 	// second index value (length of second array)should be greater than or equal to Max_Move_Step_count
 			//	x		1-loop	|	back&forth		 |	2-loop	  | 2- small 8/infinity 		     | both tiles spin
 			[[	  1,  3, 21, 19,  1,  3, 21,  3, 21,  3, 21, 19,  1,  9,  7,  3,  1,  9,  7,  3,  1,  5], 
 			[	 21, 19,  1,  3, 21, 19,  1, 19,  1, 19,  1,  3, 21, 13, 15, 19, 21, 13, 15, 19, 21, 17]];
 	isActionStation: ARRAY[1..MOVER_COUNT] OF ARRAY[1..50] OF INT := 
-			[[	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1], 
-			[	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0]];
+			[[	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  5], 
+			[	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -5]];
 	Max_Move_Step_count : INT := 22; // MovePosOrder[i][Max_Move_Step_count] should be a valid move to loop back to MovePosOrder[i][1] 
 	i_MPO_step : INT := 1;
 	ManualOveride: BOOL := FALSE;
 	bUpcomingAction: BOOL := FALSE;
+
 END_VAR
 
 ]]></Declaration>
@@ -104,8 +113,38 @@ END_IF
 
 IF ManualOveride THEN
 		
-	IF EnableMovers  THEN EnableMovers  := NOT(aMovers[1].Enable().Done  AND aMovers[2].Enable().Done ); END_IF
-	IF DisableMovers THEN DisableMovers := NOT(aMovers[1].Disable().Done AND aMovers[2].Disable().Done); END_IF
+	IF EnableMovers  THEN 
+		all_done:=TRUE;
+			FOR i:=1 TO MOVER_COUNT DO
+				IF NOT aMovers[i].Enable().Done THEN
+					all_done := FALSE;
+				END_IF
+				IF aMovers[i].Enable().Error THEN
+					ErrorOccuredInState := XPlanarState;
+					XPlanarState := 999;
+				END_IF
+			END_FOR
+			IF all_done THEN
+				EnableMovers := FALSE;
+			END_IF
+	END_IF
+	IF DisableMovers THEN
+		all_done:=TRUE;
+			FOR i:=1 TO MOVER_COUNT DO
+				IF NOT aMovers[i].Disable().Done THEN
+					all_done := FALSE;
+				END_IF
+				IF aMovers[i].Disable().Error THEN
+					ErrorOccuredInState := XPlanarState;
+					XPlanarState := 999;
+				END_IF
+			END_FOR
+			IF all_done THEN
+				DisableMovers := FALSE;
+			END_IF
+	END_IF
+	IF EnableMoverN  THEN EnableMovers  := NOT(aMovers[MoverN].Enable().Done); END_IF
+	IF DisableMoverN THEN DisableMovers := NOT(aMovers[MoverN].Disable().Done); END_IF
 	
 	IF MoveCmd1 THEN IF aMovers[1].MoveCommand.FreeMove(120,120).Done THEN MoveCmd1 := FALSE; END_IF END_IF
 	IF MoveCmd2 THEN IF aMovers[2].MoveCommand.FreeMove(120,360).Done THEN MoveCmd2 := FALSE; END_IF END_IF
@@ -129,18 +168,14 @@ IF ManualOveride THEN
 		END_IF
 	END_IF
 
-	
-	
 	// ----------------------------------------------------------------- 
 	(*
 	All sample code provided by Beckhoff Automation LLC are for illustrative purposes only and are provided “as is” and without any warranties, express or implied. 
 	Actual implementations in applications will vary significantly. 
 	Beckhoff Automation LLC shall have no liability for, and does not waive any rights in relation to, any code samples that it provides or the use of such code samples for any purpose.
 	*)
-
-
 ELSE
-	InitTimer(IN:= TRUE, PT:= T#3S, Q=> , ET=> );
+	InitTimer(IN:= TRUE, PT:= tDelayAutoStart, Q=> , ET=> );
 	CASE XPlanarState OF // not manual overide bool
 		0: //just start after Timer on Init
 			IF InitTimer.Q THEN
@@ -238,7 +273,6 @@ ELSE
 				//cmdResult[i] := aMovers[i].MoveCommand.FreeMove(); // M[i].doThing() 
 			END_FOR
 				XPlanarState := 20;
-
 			
 		200://Move movers to the next place in MovePosOrder[i] Array
 			//MOVE!!!!!
@@ -281,6 +315,11 @@ ELSE
 		900://Recovery state
 			//disable
 			//figure out which mover is closer to origin/y=0 line/bottom of tiles
+			//reset
+				FOR i := 1 TO MOVER_COUNT DO				
+				// This aPos[#] is a position index, but taken out of an array that serves as a logical position order loop
+					aMovers[i].Reset(); // M[i]
+				END_FOR
 			//enable
 			//send closer one down, farther one up, maybe one axis (xy) at a time
 			//then to positions 3 and 19 opposite corners ( different starting sequence steps)
@@ -317,15 +356,15 @@ FB_init := true; //Done]]></ST>
 //	bUpdateConstraints:=FALSE;
 //Velocity, Acceleration, Deceleration, Jerk, Rotation
 FOR i := 1 TO MOVER_COUNT DO
-	aMovers[i].Dynamics.Movement.Velocity:=Velocity;
-	aMovers[i].Dynamics.Movement.Accel:=Acceleration;
-	aMovers[i].Dynamics.Movement.Decel:=Deceleration;
-	aMovers[i].Dynamics.Movement.Jerk:=Jerk;
+	aMovers[i].Dynamics.Movement.Velocity:=Velocity_m;
+	aMovers[i].Dynamics.Movement.Accel:=Acceleration_m;
+	aMovers[i].Dynamics.Movement.Decel:=Deceleration_m;
+	aMovers[i].Dynamics.Movement.Jerk:=Jerk_m;
 	
-	aMovers[i].Dynamics.Rotation.Velocity:=Velocity;
-	aMovers[i].Dynamics.Rotation.Accel:=Acceleration;
-	aMovers[i].Dynamics.Rotation.Decel:=Deceleration;
-	aMovers[i].Dynamics.Rotation.Jerk:=Jerk;
+	aMovers[i].Dynamics.Rotation.Velocity:=Velocity_r;
+	aMovers[i].Dynamics.Rotation.Accel:=Acceleration_r;
+	aMovers[i].Dynamics.Rotation.Decel:=Deceleration_r;
+	aMovers[i].Dynamics.Rotation.Jerk:=Jerk_r;
 END_FOR
 MAIN.FB_init(TRUE,TRUE);
 //END_IF]]></ST>
