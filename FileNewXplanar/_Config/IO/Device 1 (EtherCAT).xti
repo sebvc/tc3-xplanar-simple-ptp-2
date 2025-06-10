@@ -3,13 +3,13 @@
 	<ImageDatas>
 		<ImageData Id="1000">424dd6020000000000003600000028000000100000000e0000000100180000000000a002000000000000000000000000000000000000ff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ff808080808080808080ff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ff808080808080b4b4b4b4b4b4b4b4b4808080808080ff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ff808080b4b4b4b4b4b4808080b4b4b4808080b4b4b4b4b4b4808080ff00ffff00ffff00ffff00ffff00ff808080808080b4b4b4b4b4b4808080dcdcdcdcdcdcdcdcdc808080b4b4b4b4b4b4808080808080ff00ffff00ff808080b4b4b4b4b4b4808080808080dcdcdcdcdcdcdcdcdcdcdcdcdcdcdc808080808080b4b4b4b4b4b4808080808080b4b4b4b4b4b4808080fafafaf0f0f0f0f0f0e6e6e6e6e6e6e1e1e1dcdcdcdcdcdcdcdcdc808080b4b4b4808080808080b4b4b4808080fffffffafafafafafaf0f0f0f0f0f0e6e6e6e6e6e6e1e1e1dcdcdcdcdcdcdcdcdc808080808080808080808080fffffffffffffffffffafafafafafaf0f0f0f0f0f0e6e6e6e6e6e6e1e1e1e1e1e1dcdcdcdcdcdc808080ff00ff808080808080fffffffffffffffffffafafafafafaf0f0f0f0f0f0e6e6e6e6e6e6dcdcdc808080808080ff00ffff00ffff00ffff00ff808080808080fffffffffffffffffffafafaf0f0f0f0f0f0e1e1e1808080ff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ff808080808080fffffffafafaf0f0f0808080808080ff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ff808080878787808080ff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ff</ImageData>
 	</ImageDatas>
-	<Device Id="1" DevType="111" DevFlags="#x0003" AmsPort="28673" AmsNetId="10.200.70.17.2.1" RemoteName="Device 1 (EtherCAT)" InfoImageId="2">
+	<Device Id="1" DevType="111" DevFlags="#x0003" AmsPort="28673" AmsNetId="10.200.70.22.2.1" RemoteName="Device 1 (EtherCAT)" InfoImageId="2">
 		<Name>__FILENAME__</Name>
 		<AddressInfo>
 			<Pnp>
 				<DeviceDesc>LAN2 X103 (TwinCAT-Intel PCI Ethernet Adapter (Giga</DeviceDesc>
-				<DeviceName>\DEVICE\{DD58567B-0612-4BD0-B824-EC323E31600A}</DeviceName>
-				<DeviceData>00010589db07</DeviceData>
+				<DeviceName>\DEVICE\{1031EDE7-BBC1-461C-941A-B3EE484405BF}</DeviceName>
+				<DeviceData>0001059ba482</DeviceData>
 			</Pnp>
 		</AddressInfo>
 		<Image Id="1" AddrType="9" ImageType="3">
