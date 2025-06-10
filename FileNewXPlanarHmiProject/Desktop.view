@@ -1,0 +1,37 @@
+<div id="Desktop" data-tchmi-type="TcHmi.Controls.System.TcHmiView" data-tchmi-top="0" data-tchmi-left="0" data-tchmi-width-mode="Content" data-tchmi-min-width="100" data-tchmi-min-width-unit="%" data-tchmi-height-mode="Content" data-tchmi-min-height="100" data-tchmi-min-height-unit="%">
+<div id="TcHmiGrid_1" data-tchmi-type="TcHmi.Controls.System.TcHmiGrid" data-tchmi-height="100" data-tchmi-height-unit="%" data-tchmi-left="0" data-tchmi-left-unit="px" data-tchmi-top="0" data-tchmi-top-unit="px" data-tchmi-width="100" data-tchmi-width-unit="%" data-tchmi-width-mode="Value" data-tchmi-background-image="Images/Planar1920.png" data-tchmi-background-image-vertical-alignment="Bottom" data-tchmi-background-image-horizontal-alignment="Right" data-tchmi-background-image-width-unit="%" data-tchmi-background-image-width="100" data-tchmi-background-image-height="100" data-tchmi-background-image-height-unit="%">
+
+<script data-tchmi-target-attribute="data-tchmi-row-options" type="application/json">
+[
+  {
+    "height": 1,
+    "heightMode": "Value",
+    "heightUnit": "factor",
+    "maxHeightUnit": "px",
+    "minHeightUnit": "px",
+    "overflow": false
+  },
+  {
+    "height": 5.0,
+    "heightMode": "Value",
+    "heightUnit": "factor",
+    "maxHeightUnit": "px",
+    "minHeightUnit": "px",
+    "overflow": false
+  }
+]
+</script>
+<div id="ViewDesktopBeckhoffLogo" data-tchmi-type="TcHmi.Controls.Beckhoff.TcHmiImage" data-tchmi-src="Images/Beckhoff_Logo.svg" data-tchmi-top="15" data-tchmi-width="194" data-tchmi-top-unit="%" data-tchmi-bottom="15" data-tchmi-bottom-unit="%" data-tchmi-left="2" data-tchmi-left-unit="%">
+
+<script data-tchmi-target-attribute="data-tchmi-background-color" type="application/json">
+{
+  "color": "None"
+}
+</script>
+</div>
+<div id="XPlanarView_1" data-tchmi-type="TcHmi.Controls.XPlanarView.XPlanarView" data-tchmi-grid-column-index="0" data-tchmi-grid-row-index="1" data-tchmi-left="3" data-tchmi-left-unit="%" data-tchmi-top="5" data-tchmi-top-unit="%" data-tchmi-bottom="5" data-tchmi-bottom-unit="%" data-tchmi-tile-config="%s%ADS.PLC1.XPlanarHMI.TileObjects%/s%" data-tchmi-mover-info="%s%ADS.PLC1.XPlanarHMI.MoverObjects%/s%" data-tchmi-mover-vector-data="%s%ADS.PLC1.XPlanarHMI.MoverPositions%/s%" data-tchmi-station-layout="%s%ADS.PLC1.XPlanarHMI.StationObjects%/s%" data-tchmi-rotate="False" data-tchmi-scale-to-fit="True" data-tchmi-right-unit="%" data-tchmi-width="35" data-tchmi-width-unit="%">
+</div>
+<div id="TcHmiEcDiagnostics_1" data-tchmi-type="TcHmi.Controls.Beckhoff.TcHmiEcDiagnostics" data-tchmi-allow-zoom-and-pan="True" data-tchmi-device="Device1" data-tchmi-grid-column-index="0" data-tchmi-grid-row-index="1" data-tchmi-toolbox-reset-view="True" data-tchmi-top="5" data-tchmi-top-unit="%" data-tchmi-bottom="5" data-tchmi-right="3" data-tchmi-width="55" data-tchmi-width-unit="%" data-tchmi-left-unit="%" data-tchmi-right-unit="%" data-tchmi-bottom-unit="%" data-tchmi-height-unit="%">
+</div>
+</div>
+</div>

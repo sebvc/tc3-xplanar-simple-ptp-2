@@ -716,7 +716,7 @@
 		</DataType>
 	</DataTypes>
 	<Project GUID="{A4D96657-984E-4CC4-89C5-7ABD531749D9}" Name="PLC_Proj" PrjFilePath="..\..\PLC_Proj\PLC_Proj.plcproj" TmcFilePath="..\..\PLC_Proj\PLC_Proj.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-		<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="1" TmcHash="{9111B8EF-FF75-C187-CB4B-CE687B8677F7}" TmcPath="PLC_Proj\PLC_Proj.tmc">
+		<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="1" TmcHash="{32FAFE7F-8537-2816-8A27-E58A0DFB808D}" TmcPath="PLC_Proj\PLC_Proj.tmc">
 			<Name>PLC_Proj Instance</Name>
 			<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 			<Vars VarGrpType="2" AreaNo="1">
