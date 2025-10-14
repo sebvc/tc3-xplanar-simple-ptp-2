@@ -332,11 +332,15 @@ END_IF
     <Method Name="FB_init" Id="{c9a65361-55a5-4e9a-8a2a-46c857466d83}">
       <Declaration><![CDATA[METHOD FB_init : BOOL
 VAR_INPUT
-    bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
-    bInCopyCode  : BOOL; // if TRUE, the instance afterwards gets moved into the copy code (online change)
+	// is TRUE when the retain variables are initialized (warm start / cold start)
+    bInitRetains : BOOL; 
+	
+	// is TRUE when the instance afterwards gets moved into the copy code (online change)
+    bInCopyCode  : BOOL; 
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[FOR i := 1 TO XPlanarApplication.SystemParameters.MOVER_COUNT DO
+        <ST><![CDATA[// Just cyclic code will run after every initialization of MAIN (warm start / cold start / online change)
+FOR i := 1 TO XPlanarApplication.SystemParameters.MOVER_COUNT DO
 	ip.Movers[i] := aMovers[i];
 END_FOR
 FOR i := 1 TO XPlanarApplication.SystemParameters.TRACK_COUNT DO
