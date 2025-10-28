@@ -7,7 +7,7 @@ VAR CONSTANT
 	TRACK_COUNT : UINT := XPlanarApplication.SystemParameters.TRACK_COUNT;
 END_VAR
 VAR
-	LicUsbState AT %I* : UINT; // license dongle state
+	LicUsbState AT %I* : E_UsbLicenseDongleSate;//UINT; // license dongle state
 	XPlanarTable : FB_Component_XPlanar;
 	aMovers : ARRAY[1..MOVER_COUNT] OF FB_XPlanarMover;
 	aTracks : ARRAY[1..TRACK_COUNT] OF FB_XPlanarTrackSegment;
@@ -27,6 +27,7 @@ VAR
 
 	
 	CmdResult :  ARRAY[1..MOVER_COUNT] OF I_PlanarTaskResult;
+	CmdRecoverResult :  ARRAY[1..4] OF I_PlanarTaskResult;
 	
 	all_done: BOOL;
 	all_done_count : UINT;
@@ -62,6 +63,10 @@ VAR
 	//Delay Start Auto Run
 	InitTimer: TON;
 	tDelayAutoStart: TIME := T#5S;
+	ResetTimer: TON;
+	bAutoReset : BOOL:=TRUE;
+	bRecoverReset : BOOL:=FALSE;
+	tDelayAutoRecover: TIME := T#5S;
 
 	//Move Sequence
 	MovePosOrder : ARRAY[1..MOVER_COUNT] OF ARRAY[1..50] OF INT := 	// second index value (length of second array)should be greater than or equal to Max_Move_Step_count
@@ -175,7 +180,8 @@ IF ManualOveride THEN
 	Beckhoff Automation LLC shall have no liability for, and does not waive any rights in relation to, any code samples that it provides or the use of such code samples for any purpose.
 	*)
 ELSE
-	InitTimer(IN:= TRUE, PT:= tDelayAutoStart, Q=> , ET=> );
+	InitTimer(IN:= bAutoReset, PT:= tDelayAutoStart);
+	ResetTimer(IN:= bRecoverReset, PT:= tDelayAutoRecover);
 	CASE XPlanarState OF // not manual overide bool
 		0: //just start after Timer on Init
 			IF InitTimer.Q THEN
@@ -207,7 +213,7 @@ ELSE
 				IF NOT aMovers[i].Enable().Done THEN
 					all_done := FALSE;
 				END_IF
-				IF aMovers[i].Enable().Error THEN
+				IF aMovers[i].Enable().Error OR XPlanarTable.Error THEN
 					ErrorOccuredInState := XPlanarState;
 					XPlanarState := 999;
 				END_IF
@@ -312,14 +318,58 @@ ELSE
 		
 	*)
 		999://Wait Here for troubleshooting in case of error
-		900://Recovery state
 			//disable
-			//figure out which mover is closer to origin/y=0 line/bottom of tiles
-			//reset
-				FOR i := 1 TO MOVER_COUNT DO				
-				// This aPos[#] is a position index, but taken out of an array that serves as a logical position order loop
-					aMovers[i].Reset(); // M[i]
+				XplanarTable.Reset();
+				bRecoverReset := FALSE;
+				//CmdRecoverResult[4]:=XplanarTable.DisableMovers();
+				XPlanarState:=900;
+		900:
+				all_done:=TRUE;
+				FOR i:=1 TO MOVER_COUNT DO
+					cmdResult[i]:=aMovers[i].Disable();
+					IF NOT cmdResult[i].Done THEN
+						all_done := FALSE;
+					END_IF
 				END_FOR
+				IF all_done THEN
+					XPlanarState := 903;
+					bRecoverReset := TRUE;
+				END_IF
+		903://Recovery state
+				IF ResetTimer.Q THEN
+					XPlanarTable.Reset();
+					bRecoverReset := FALSE;
+					XPlanarState:=910; //enable
+				END_IF
+		910: //reset movers
+				all_done:=TRUE;
+				FOR i:=1 TO MOVER_COUNT DO
+					cmdResult[i]:=aMovers[i].Reset();
+					IF NOT cmdResult[i].Done THEN
+						all_done := FALSE;
+					END_IF
+				END_FOR
+				IF all_done THEN
+					XPlanarState := 920;
+				END_IF
+								
+		920: // redetect movers
+				CmdRecoverResult[1]:=XplanarTable.MoverRedetect();
+				XPlanarState:=921;
+		921:
+				IF CmdResult[1].Done THEN
+					XPlanarState:=930;
+				END_IF
+		930: // identify movers;
+				CmdRecoverResult[2]:=XplanarTable.IdentifyMovers();
+				XPlanarState:=931;
+		931:
+				IF CmdResult[1].Done THEN
+					XPlanarState:=0;//enable init
+					MAIN.FB_init(TRUE,TRUE);
+				END_IF
+
+			//figure out which mover is closer to origin/y=0 line/bottom of tiles
 			//enable
 			//send closer one down, farther one up, maybe one axis (xy) at a time
 			//then to positions 3 and 19 opposite corners ( different starting sequence steps)

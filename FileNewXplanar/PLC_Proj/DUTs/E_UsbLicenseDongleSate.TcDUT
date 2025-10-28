@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="E_UsbLicenseDongleSate" Id="{e1fc66c9-f12b-4f1d-bd34-656134e80299}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+{attribute 'to_string'}
+TYPE E_UsbLicenseDongleSate : // for (C9900-L100 License-Key-USB-Stick) > BoxInfo > BoxStateVar
+(
+	NO_ERROR			:= 16#0000,	// 0x0000 = No error
+	NO_ACTUAL_INPUTS	:= 16#0001,	// 0x0001 = No actual inputs
+	NOT_FOUND			:= 16#0004	// 0x0004 = Not found
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

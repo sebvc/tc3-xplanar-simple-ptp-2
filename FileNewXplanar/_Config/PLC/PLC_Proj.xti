@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.16" ClassName="CNestedPlcProjDef">
+<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.19" ClassName="CNestedPlcProjDef">
 	<DataTypes>
 		<DataType>
 			<Name GUID="{79107B5F-AFEC-4E5A-AF95-460E7D782CE1}" Namespace="MC" TcBaseType="true">CDT_MCTOPLC_PLANAR_ENVIRONMENT</Name>
@@ -115,6 +115,40 @@
 			</SubItem>
 		</DataType>
 		<DataType>
+			<Name GUID="{6330303B-4F5E-A261-8A25-4E90D149C1E7}" AutoDeleteType="true">E_UsbLicenseDongleSate</Name>
+			<BitSize>16</BitSize>
+			<BaseType GUID="{18071995-0000-0000-0000-000000000006}">INT</BaseType>
+			<EnumInfo>
+				<Text><![CDATA[NO_ERROR]]></Text>
+				<Enum>0</Enum>
+				<Comment><![CDATA[ 0x0000 = No error]]></Comment>
+			</EnumInfo>
+			<EnumInfo>
+				<Text><![CDATA[NO_ACTUAL_INPUTS]]></Text>
+				<Enum>1</Enum>
+				<Comment><![CDATA[ 0x0001 = No actual inputs]]></Comment>
+			</EnumInfo>
+			<EnumInfo>
+				<Text><![CDATA[NOT_FOUND]]></Text>
+				<Enum>4</Enum>
+				<Comment><![CDATA[ 0x0004 = Not found]]></Comment>
+			</EnumInfo>
+			<Properties>
+				<Property>
+					<Name>qualified_only</Name>
+				</Property>
+				<Property>
+					<Name>strict</Name>
+				</Property>
+				<Property>
+					<Name>to_string</Name>
+				</Property>
+				<Property>
+					<Name>generate_implicit_init_function</Name>
+				</Property>
+			</Properties>
+		</DataType>
+		<DataType>
 			<Name GUID="{FAE6DCD6-33EF-4275-8592-10BCED19E1EA}" Namespace="MC">MC_PLANAR_MOVER_COMMAND_MODE</Name>
 			<Comment><![CDATA[Indicates the command mode of an enabled PlanarMover, i.e. how setpoints are currently produced.]]></Comment>
 			<BitSize>16</BitSize>
@@ -152,12 +186,17 @@
 			<EnumInfo>
 				<Text><![CDATA[CRotationFreeMovement]]></Text>
 				<Enum>106</Enum>
-				<Comment><![CDATA[Indicates that the PlanarMover only rotating the C coordinate in free movement, X and Y are standing.]]></Comment>
+				<Comment><![CDATA[Indicates that the PlanarMover is only rotating the C coordinate in free movement, X and Y are standing.]]></Comment>
 			</EnumInfo>
 			<EnumInfo>
 				<Text><![CDATA[CRotationOnTrack]]></Text>
 				<Enum>107</Enum>
-				<Comment><![CDATA[Indicates that the PlanarMover only rotating the C coordinate on a track, X and Y are standing.]]></Comment>
+				<Comment><![CDATA[Indicates that the PlanarMover is only rotating the C coordinate on a track, X and Y are standing.]]></Comment>
+			</EnumInfo>
+			<EnumInfo>
+				<Text><![CDATA[ExternalBodeplot]]></Text>
+				<Enum>109</Enum>
+				<Comment><![CDATA[Indicates that the PlanarMover is following external bodeplot setpoints.]]></Comment>
 			</EnumInfo>
 			<Properties>
 				<Property>
@@ -716,7 +755,7 @@
 		</DataType>
 	</DataTypes>
 	<Project GUID="{A4D96657-984E-4CC4-89C5-7ABD531749D9}" Name="PLC_Proj" PrjFilePath="..\..\PLC_Proj\PLC_Proj.plcproj" TmcFilePath="..\..\PLC_Proj\PLC_Proj.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-		<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="1" TmcHash="{32FAFE7F-8537-2816-8A27-E58A0DFB808D}" TmcPath="PLC_Proj\PLC_Proj.tmc">
+		<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="1" TmcHash="{9E339B9D-1DEB-9869-A548-77342CD1E5BF}" TmcPath="PLC_Proj\PLC_Proj.tmc">
 			<Name>PLC_Proj Instance</Name>
 			<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 			<Vars VarGrpType="2" AreaNo="1">
@@ -746,8 +785,8 @@
 				</Var>
 				<Var>
 					<Name>MAIN.LicUsbState</Name>
-					<Comment><![CDATA[ license dongle state]]></Comment>
-					<Type>UINT</Type>
+					<Comment><![CDATA[UINT; // license dongle state]]></Comment>
+					<Type GUID="{6330303B-4F5E-A261-8A25-4E90D149C1E7}">E_UsbLicenseDongleSate</Type>
 				</Var>
 				<Var>
 					<Name>MAIN.aMovers[1]._Mover.MCTOPLC</Name>
@@ -770,6 +809,13 @@
 					<Type GUID="{5769ADF0-D6E6-40D9-B474-790A2A7F1D1F}" Namespace="MC">CDT_MCTOPLC_PLANAR_TRACK</Type>
 				</Var>
 			</Vars>
+			<UnrestoredVarLinks ImportTime="2025-10-13T20:01:54">
+				<OwnerA Name="InputDst" Prefix="TIPC^PLC_Proj^PLC_Proj Instance" Type="1">
+					<OwnerB Name="TIID^Device 2 (USB)^Box 2 (C9900-L100 License-Key-USB-Stick)">
+						<Link VarA="MAIN.LicUsbState" TypeA="UINT" InOutA="0" GuidA="{18071995-0000-0000-0000-000000000005}" VarB="BoxInfo^BoxState" RestoreInfo="TypeMismatch" OldTypeA="UINT" OldGuidA="{18071995-0000-0000-0000-000000000005}" NewTypeA="E_UsbLicenseDongleSate" NewGuidA="{6330303B-4F5E-A261-8A25-4E90D149C1E7}"/>
+					</OwnerB>
+				</OwnerA>
+			</UnrestoredVarLinks>
 			<Contexts>
 				<Context>
 					<Id>0</Id>

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.16" ClassName="CTComObjDef">
+<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.19" ClassName="CTComObjDef">
 	<DataTypes>
 		<DataType>
 			<Name GUID="{3ED0362E-AEE3-442B-BB1E-CD6012F602CD}" Namespace="TcIoXPlanar">XPlanarMoverType</Name>
@@ -3442,7 +3442,7 @@
 					<AreaNo AreaType="InputDst" CreateSymbols="true">3</AreaNo>
 					<Name>InputsFromNC3</Name>
 					<ContextId>1</ContextId>
-					<ByteSize X64="#x8">4</ByteSize>
+					<ByteSize X64="8">4</ByteSize>
 					<Symbol>
 						<Name>NC3ToHW</Name>
 						<BitSize X64="64">32</BitSize>
@@ -3465,7 +3465,7 @@
 					<AreaNo AreaType="OutputSrc" CreateSymbols="true">4</AreaNo>
 					<Name>OutputsToNC3</Name>
 					<ContextId>1</ContextId>
-					<ByteSize X64="#x8">4</ByteSize>
+					<ByteSize X64="8">4</ByteSize>
 					<Symbol>
 						<Name>HWToNC3</Name>
 						<BitSize X64="64">32</BitSize>
