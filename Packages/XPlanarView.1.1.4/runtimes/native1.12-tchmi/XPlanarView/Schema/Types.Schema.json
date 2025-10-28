@@ -1,0 +1,235 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "definitions": {
+    "TcHmi.Controls.XPlanarView.XPlanarView": {
+      "type": "object",
+      "frameworkInstanceOf": "TcHmi.Controls.System.TcHmiControl",
+      "frameworkControlType": "XPlanarView",
+      "frameworkControlNamespace": "TcHmi.Controls.XPlanarView"
+    },
+    "TcHmi.Controls.XPlanarView.XPlanarView.TileConfig": {
+      "type": "array",
+      "title": "TileConfig",
+      "items": {
+        "type": "object",
+        "title": "TileData",
+        "engineeringColumns": [ "X", "Y", "Width", "Height" ],
+        "propertiesMeta": [
+          {
+            "name": "X",
+            "displayName": "X",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "x coordinate",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          },
+          {
+            "name": "Y",
+            "displayName": "Y",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "y coordinate",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          },
+          {
+            "name": "Width",
+            "displayName": "Width",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "Tile Width",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          },
+          {
+            "name": "Height",
+            "displayName": "Height",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "Tile Height",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          }
+        ],
+        "properties": {
+          "X": {
+            "type": "number"
+          },
+          "Y": {
+            "type": "number"
+          },
+          "Width": {
+            "type": "number"
+          },
+          "Height": {
+            "type": "number"
+          }
+        },
+        "required": [ "X", "Y", "Width", "Height" ]
+      }
+    },
+    "TcHmi.Controls.XPlanarView.XPlanarView.MoverVectorData": {
+      "type": "array",
+      "title": "MoverVectorData",
+      "items": {
+        "type": "object",
+        "title": "MoverVector",
+        "engineeringColumns": [ "x", "y", "c" ],
+        "propertiesMeta": [
+          {
+            "name": "x",
+            "displayName": "x",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "x coordinate",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          },
+          {
+            "name": "y",
+            "displayName": "y",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "y coordinate",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          },
+          {
+            "name": "c",
+            "displayName": "c",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "Mover rotation",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          }
+        ],
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "c": {
+            "type": "number"
+          }
+        },
+        "required": [ "x", "y", "c" ]
+      }
+    },
+    "TcHmi.Controls.XPlanarView.XPlanarView.MoverInfo": {
+      "type": "array",
+      "title": "MoverInfo",
+      "items": {
+        "type": "object",
+        "title": "MoverInfo",
+        "engineeringColumns": [ "Width", "Height", "MoverBTN" ],
+        "propertiesMeta": [
+          {
+            "name": "Width",
+            "displayName": "Width",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "Mover Width",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          },
+          {
+            "name": "Height",
+            "displayName": "Height",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "Mover Height",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          },
+          {
+            "name": "MoverBTN",
+            "displayName": "MoverBTN",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "Mover BTN",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          }
+        ],
+        "properties": {
+          "Width": {
+            "type": "number"
+          },
+          "Height": {
+            "type": "number"
+          },
+          "MoverBTN": {
+            "type": "string"
+          }
+        },
+        "required": [ "Width", "Height", "MoverBTN" ]
+      }
+    },
+    "TcHmi.Controls.XPlanarView.XPlanarView.StationLayout": {
+      "type": "array",
+      "title": "StationLayout",
+      "items": {
+        "type": "object",
+        "title": "StationData",
+        "engineeringColumns": [ "X", "Y", "Width", "Height" ],
+        "propertiesMeta": [
+          {
+            "name": "X",
+            "displayName": "X",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "x coordinate",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          },
+          {
+            "name": "Y",
+            "displayName": "Y",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "y coordinate",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          },
+          {
+            "name": "Width",
+            "displayName": "Width",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "Station Width",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          },
+          {
+            "name": "Height",
+            "displayName": "Height",
+            "category": "General",
+            "displayPriority": 10,
+            "description": "Station Height",
+            "defaultValue": null,
+            "defaultValueInternal": null
+          }
+        ],
+        "properties": {
+          "X": {
+            "type": "number"
+          },
+          "Y": {
+            "type": "number"
+          },
+          "Width": {
+            "type": "number"
+          },
+          "Height": {
+            "type": "number"
+          }
+        },
+        "required": [ "X", "Y", "Width", "Height" ]
+      }
+    }
+  }
+}

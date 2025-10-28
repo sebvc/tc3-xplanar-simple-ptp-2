@@ -1,0 +1,201 @@
+{
+  "$schema": "../.hmiframework/Schema/ControlDescription.Schema.json",
+  "apiVersion": 1,
+  "name": "XPlanarView",
+  "namespace": "TcHmi.Controls.XPlanarView",
+  "displayName": "XPlanarView",
+  "version": {
+    "full": "1.1.2.0",
+    "major": 1,
+    "minor": 1,
+    "revision": 2,
+    "build": 0
+  },
+  "visible": true,
+  "themeable": "Standard",
+  "base": "TcHmi.Controls.System.TcHmiControl",
+  "description": "View an XPlanar System",
+  "properties": {
+    "containerControl": false,
+    "geometry": {
+      "width": 150,
+      "height": 150
+    }
+  },
+  "icons": [
+    {
+      "name": "Icons/XPlanarIcon.png",
+      "width": 16,
+      "height": 16
+    }
+  ],
+  "template": "Template.html",
+  "dependencyFiles": [
+    {
+      "name": "XPlanarView.js",
+      "type": "JavaScript",
+      "description": "Contains all the main logic."
+    },
+    {
+      "name": "Style.css",
+      "type": "Stylesheet",
+      "description": "Theme independent style"
+    }
+  ],
+    "themes": {
+        "Base": {
+            "resources": [
+                {
+                    "name": "Themes/Base/Style.css",
+                    "type": "Stylesheet",
+                    "description": "Theme dependent style"
+                }
+            ]
+        },
+        "Base-Dark": {
+            "resources": [
+                {
+                    "name": "Themes/Base-Dark/Style.css",
+                    "type": "Stylesheet",
+                    "description": "Theme dependent style"
+                }
+            ]
+        }
+    },
+  "attributes": [
+    {
+      "name": "data-tchmi-tile-config",
+      "propertyName": "TileConfig",
+      "propertySetterName": "setTileConfig",
+      "propertyGetterName": "getTileConfig",
+      "displayName": "TileConfig",
+      "visible": true,
+      "themeable": "Standard",
+      "displayPriority": 10,
+      "type": "tchmi:framework#/definitions/TcHmi.Controls.XPlanarView.XPlanarView.TileConfig",
+      "category": "Common",
+      "description": "An array containing positions and sizes of tiles. Tile Config data must match below naming - \n { \n\tX: number, \n\tY: number, \n\tWidth: number, \n\tHeight: number \n }",
+      "readOnly": false,
+      "bindable": true,
+      "heritable": true,
+      "defaultValue": null,
+      "defaultValueInternal": []
+    },
+    {
+      "name": "data-tchmi-mover-info",
+      "propertyName": "MoverInfo",
+      "propertySetterName": "setMoverInfo",
+      "propertyGetterName": "getMoverInfo",
+      "displayName": "MoverInfo",
+      "visible": true,
+      "themeable": "Standard",
+      "displayPriority": 10,
+      "type": "tchmi:framework#/definitions/TcHmi.Controls.XPlanarView.XPlanarView.MoverInfo",
+      "category": "Common",
+      "description": "An array containing mover sizes and BTNs. Mover Info data must match below naming - \n { \n\tWidth: number, \n\tHeight: number, \n\tMoverBTN: string \n }",
+      "readOnly": false,
+      "bindable": true,
+      "heritable": true,
+      "defaultValue": null,
+      "defaultValueInternal": []
+    },
+    {
+      "name": "data-tchmi-mover-vector-data",
+      "propertyName": "MoverVectorData",
+      "propertySetterName": "setMoverVectorData",
+      "propertyGetterName": "getMoverVectorData",
+      "displayName": "MoverVectorData",
+      "visible": true,
+      "themeable": "Standard",
+      "displayPriority": 10,
+      "type": "tchmi:framework#/definitions/Symbol",
+      "category": "Common",
+      "description": "Symbol containing mover vectors. Mover Vector data must match below naming - \n { \n\tx: number, \n\ty: number, \n\tz: number, \n\tc: number \n }",
+      "readOnly": false,
+      "bindable": true,
+      "heritable": true,
+      "defaultValue": null,
+      "defaultValueInternal": null
+    },
+    {
+      "name": "data-tchmi-refresh-rate",
+      "propertyName": "RefreshRate",
+      "propertySetterName": "setRefreshRate",
+      "propertyGetterName": "getRefreshRate",
+      "displayName": "RefreshRate",
+      "visible": true,
+      "themeable": "Standard",
+      "displayPriority": 10,
+      "type": "tchmi:general#/definitions/Number",
+      "category": "Common",
+      "description": "Interval in ms at which the control gets new vector data from the server. 100 ms is default and recommended. Higher numbers will be choppy and lower numbers may put a heavier load on the network.",
+      "readOnly": false,
+      "bindable": true,
+      "heritable": true,
+      "defaultValue": null,
+      "defaultValueInternal": 100
+    },
+    {
+      "name": "data-tchmi-station-layout",
+      "propertyName": "StationLayout",
+      "propertySetterName": "setStationLayout",
+      "propertyGetterName": "getStationLayout",
+      "displayName": "StationLayout",
+      "visible": true,
+      "themeable": "Standard",
+      "displayPriority": 10,
+      "type": "tchmi:framework#/definitions/TcHmi.Controls.XPlanarView.XPlanarView.StationLayout",
+      "category": "Common",
+      "description": "An array containing positions and sizes of stations. Station Layout data must match below naming - \n { \n\tX: number, \n\tY: number, \n\tWidth: number, \n\tHeight: number \n }",
+      "readOnly": false,
+      "bindable": true,
+      "heritable": true,
+      "defaultValue": null,
+      "defaultValueInternal": []
+    },
+    {
+      "name": "data-tchmi-scale-to-fit",
+      "propertyName": "ScaleToFit",
+      "propertySetterName": "setScaleToFit",
+      "propertyGetterName": "getScaleToFit",
+      "displayName": "ScaleToFit",
+      "visible": true,
+      "themeable": "Standard",
+      "displayPriority": 10,
+      "type": "tchmi:general#/definitions/Boolean",
+      "category": "Common",
+      "description": "",
+      "readOnly": false,
+      "bindable": true,
+      "heritable": true,
+      "defaultValue": null,
+      "defaultValueInternal": true
+    },
+    {
+      "name": "data-tchmi-rotate",
+      "propertyName": "Rotate",
+      "propertySetterName": "setRotate",
+      "propertyGetterName": "getRotate",
+      "displayName": "Rotate",
+      "visible": true,
+      "themeable": "Standard",
+      "displayPriority": 10,
+      "type": "tchmi:general#/definitions/Boolean",
+      "category": "Common",
+      "description": "If set, the track will rotate 90 degrees clockwise.",
+      "readOnly": false,
+      "bindable": true,
+      "heritable": true,
+      "defaultValue": null,
+      "defaultValueInternal": false
+    }
+  ],
+  "attributeCategories": [],
+  "functions": [],
+  "events": [],
+  "dataTypes": [
+    {
+      "schema": "Schema/Types.Schema.json"
+    }
+  ]
+}
